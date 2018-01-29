@@ -1,3 +1,4 @@
+require 'hashie/logger'
 require 'hashie/version'
 
 module Hashie
@@ -8,6 +9,7 @@ module Hashie
   autoload :Trash,              'hashie/trash'
   autoload :Rash,               'hashie/rash'
   autoload :Array,              'hashie/array'
+  autoload :Utils,              'hashie/utils'
 
   module Extensions
     autoload :Coercion,          'hashie/extensions/coercion'
@@ -48,7 +50,9 @@ module Hashie
     end
 
     module Mash
+      autoload :KeepOriginalKeys, 'hashie/extensions/mash/keep_original_keys'
       autoload :SafeAssignment, 'hashie/extensions/mash/safe_assignment'
+      autoload :SymbolizeKeys, 'hashie/extensions/mash/symbolize_keys'
     end
 
     module Array
@@ -60,4 +64,6 @@ module Hashie
     include Hashie::Extensions::StringifyKeys::ClassMethods
     include Hashie::Extensions::SymbolizeKeys::ClassMethods
   end
+
+  require 'hashie/railtie' if defined?(::Rails)
 end

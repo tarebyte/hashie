@@ -3,10 +3,23 @@ module Hashie
 
   module Extensions
     module Coercion
-      ABSTRACT_CORE_TYPES = {
-        Integer => [Fixnum, Bignum],
-        Numeric => [Fixnum, Bignum, Float, Complex, Rational]
+      CORE_TYPES = {
+        Integer    => :to_i,
+        Float      => :to_f,
+        Complex    => :to_c,
+        Rational   => :to_r,
+        String     => :to_s,
+        Symbol     => :to_sym
       }
+
+      ABSTRACT_CORE_TYPES = if RubyVersion.new(RUBY_VERSION) >= RubyVersion.new('2.4.0')
+                              { Numeric => [Integer, Float, Complex, Rational] }
+                            else
+                              {
+                                Integer => [Fixnum, Bignum],
+                                Numeric => [Fixnum, Bignum, Float, Complex, Rational]
+                              }
+                            end
 
       class CoercionSystemIncludeBuilder < Module
         attr_reader :common_included_block

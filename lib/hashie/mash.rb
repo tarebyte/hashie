@@ -1,5 +1,7 @@
 require 'hashie/hash'
 require 'hashie/array'
+require 'hashie/utils'
+require 'hashie/logger'
 
 module Hashie
   # Mash allows you to create pseudo-objects that have method-like
@@ -61,6 +63,38 @@ module Hashie
 
     ALLOWED_SUFFIXES = %w(? ! = _)
 
+    class CannotDisableMashWarnings < StandardError
+      def initialize(message = 'You cannot disable warnings on the base Mash class. Please subclass the Mash and disable it in the subclass.')
+        super(message)
+      end
+    end
+
+    # Disable the logging of warnings based on keys conflicting keys/methods
+    #
+    # @api semipublic
+    # @return [void]
+    def self.disable_warnings
+      fail CannotDisableMashWarnings if self == Hashie::Mash
+      @disable_warnings = true
+    end
+
+    # Checks whether this class disables warnings for conflicting keys/methods
+    #
+    # @api semipublic
+    # @return [Boolean]
+    def self.disable_warnings?
+      @disable_warnings ||= false
+    end
+
+    # Inheritance hook that sets class configuration when inherited.
+    #
+    # @api semipublic
+    # @return [void]
+    def self.inherited(subclass)
+      super
+      subclass.disable_warnings if disable_warnings?
+    end
+
     def self.load(path, options = {})
       @_mashes ||= new
 
@@ -109,7 +143,10 @@ module Hashie
     # a string before it is set, and Hashes will be converted
     # into Mashes for nesting purposes.
     def custom_writer(key, value, convert = true) #:nodoc:
-      regular_writer(convert_key(key), convert ? convert_value(value) : value)
+      key_as_symbol = (key = convert_key(key)).to_sym
+
+      log_built_in_message(key_as_symbol) if log_collision?(key_as_symbol)
+      regular_writer(key, convert ? convert_value(value) : value)
     end
 
     alias_method :[], :custom_reader
@@ -152,6 +189,7 @@ module Hashie
       self.class.new(self, default)
     end
 
+    alias_method :regular_key?, :key?
     def key?(key)
       super(convert_key(key))
     end
@@ -294,6 +332,26 @@ module Hashie
       else
         val
       end
+    end
+
+    private
+
+    def log_built_in_message(method_key)
+      return if self.class.disable_warnings?
+
+      method_information = Hashie::Utils.method_information(method(method_key))
+
+      Hashie.logger.warn(
+        'You are setting a key that conflicts with a built-in method ' \
+        "#{self.class}##{method_key} #{method_information}. " \
+        'This can cause unexpected behavior when accessing the key as a ' \
+        'property. You can still access the key via the #[] method.'
+      )
+    end
+
+    def log_collision?(method_key)
+      respond_to?(method_key) && !self.class.disable_warnings? &&
+        !(regular_key?(method_key) || regular_key?(method_key.to_s))
     end
   end
 end

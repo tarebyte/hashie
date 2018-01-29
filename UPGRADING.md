@@ -1,6 +1,31 @@
 Upgrading Hashie
 ================
 
+### Upgrading to 3.5.2
+
+#### Disable logging in Mash subclasses
+
+If you subclass `Hashie::Mash`, you can now disable the logging we do about
+overriding existing methods with keys. This looks like:
+
+```ruby
+class MyMash < Hashie::Mash
+  disable_warnings
+end
+```
+
+### Upgrading to 3.4.7
+
+#### Procs as default values for Dash
+
+```ruby
+class MyHash < Hashie::Dash
+  property :time, default: -> { Time.now }
+end
+```
+
+In versions < 3.4.7 `Time.now` will be evaluated when `time` property is accessed directly first time.
+In version >= 3.4.7 `Time.now` is evaluated in time of object initialization.
 ### Upgrading to 3.4.4
 
 #### Mash subclasses and reverse_merge

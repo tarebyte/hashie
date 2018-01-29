@@ -8,7 +8,7 @@ scheme are considered to be bugs.
 
 ## [Unreleased][unreleased]
 
-[3.4.7]: https://github.com/intridea/hashie/compare/v3.4.6...master
+[unreleased]: https://github.com/intridea/hashie/compare/v3.5.7...master
 
 ### Added
 
@@ -28,18 +28,121 @@ scheme are considered to be bugs.
 
 ### Fixed
 
-* [#369](https://github.com/intridea/hashie/pull/369): If a translation for a property exists when using IndifferentAccess and IgnoreUndeclared, use the translation to find the property - [@whitethunder](https://github.com/whitethunder).
-* [#376](https://github.com/intridea/hashie/pull/376): Leave string index unchanged if it can't be converted to integer for Array#dig - [@sazor](https://github.com/sazor).
-* [#377](https://github.com/intridea/hashie/pull/377): Dont use Rubygems to check ruby version - [@sazor](https://github.com/sazor).
-* [#378](https://github.com/intridea/hashie/pull/378): Deep find all searches inside all nested hashes - [@sazor](https://github.com/sazor).
+* Your contribution here.
 
 ### Security
 
 * Your contribution here.
 
-### Miscellanous
+### Miscellaneous
 
 * Your contribution here.
+
+## [3.5.7] - 2017-12-19
+
+[3.5.7]: https://github.com/intridea/hashie/compare/v3.5.6...v3.5.7
+
+### Fixed
+
+[#430](https://github.com/intridea/hashie/pull/430): Fix Hashie::Rash randomly losing items - [@Antti](https://github.com/Antti)
+
+### Miscellaneous
+
+* [#425](https://github.com/intridea/hashie/pull/425): Update rubies in CI - [@kachick](https://github.com/kachick).
+
+## [3.5.6] - 2017-07-12
+
+[3.5.6]: https://github.com/intridea/hashie/compare/v3.5.5...v3.5.6
+
+### Miscellaneous
+
+* [#416](https://github.com/intridea/hashie/pull/416): Fix `warning: instance variable @disable_warnings not initialized` - [@axfcampos](https://github.com/axfcampos).
+
+## [3.5.5] - 2017-02-24
+
+[3.5.5]: https://github.com/intridea/hashie/compare/v3.5.4...v3.5.5
+
+### Added
+
+* [#326](https://github.com/intridea/hashie/pull/326): Added `Hashie::Extensions::Mash::KeepOriginalKeys` to give Mashes the ability to keep the original structure given to it - [@michaelherold](https://github.com/michaelherold).
+
+### Fixed
+
+* [#415](https://github.com/intridea/hashie/pull/415): Fixed Mash logging keys multiple times which lead to a bad user experience or, in some cases, errors - [@michaelherold](https://github.com/michaelherold).
+
+## [3.5.4] - 2017-02-22
+
+[3.5.4]: https://github.com/intridea/hashie/compare/v3.5.3...v3.5.4
+
+### Added
+
+* [#412](https://github.com/intridea/hashie/pull/412): Added a Hashie::Extensions::Mash::SymbolizeKeys extension that overrides the default stringification behavior for keys - [@michaelherold](https://github.com/michaelherold).
+
+### Fixed
+
+* [#409](https://github.com/intridea/hashie/pull/409): Fixed Railtie detection for projects where Rails is defined but Railties are not availble - [@CallumD](https://github.com/callumd).
+* [#411](https://github.com/intridea/hashie/pull/411): Fixed a performance regression from 3.4.3 that caused a 10x slowdown in OmniAuth - [@michaelherold](https://github.com/michaelherold).
+
+## [3.5.3] - 2017-02-11
+
+[3.5.3]: https://github.com/intridea/hashie/compare/v3.5.2...v3.5.3
+
+### Fixed
+
+* [#402](https://github.com/intridea/hashie/pull/402): Use a Railtie to set Hashie.logger on rails boot - [@matthewrudy](https://github.com/matthewrudy).
+* [#406](https://github.com/intridea/hashie/pull/406): Ensure that subclasses that disable warnings propagate that setting to grandchild classes - [@michaelherold](https://github.com/michaelherold).
+* Your contribution here.
+
+## [3.5.2] - 2017-02-10
+
+[3.5.2]: https://github.com/intridea/hashie/compare/v3.5.1...v3.5.2
+
+### Added
+
+* [#395](https://github.com/intridea/hashie/pull/395): Add the ability to disable warnings in Mash subclasses - [@michaelherold](https://github.com/michaelherold).
+* [#400](https://github.com/intridea/hashie/pull/400): Fix Hashie.logger load and set the Hashie logger to the Rails logger in a Rails environment - [@michaelherold](https://github.com/michaelherold).
+
+### Fixed
+
+* [#396](https://github.com/intridea/hashie/pull/396): Fix for specs in #381: Incorrect use of shared context meant example was not being run - [@biinari](https://github.com/biinari).
+* [#399](https://github.com/intridea/hashie/pull/399): Fix passing Pathname object to Hashie::Mesh.load() - [@albb0920](https://github.com/albb0920).
+
+### Miscellanous
+
+* [#397](https://github.com/intridea/hashie/pull/397): Add the integration specs harness into the main test tasks - [@michaelherold](https://github.com/michaelherold).
+
+## [3.5.1] - 2017-01-31
+
+* [#392](https://github.com/intridea/hashie/pull/392): Fix for #391: Require all dependencies of Hashie::Mash - [@dblock](https://github.com/dblock).
+
+[3.5.1]: https://github.com/intridea/hashie/compare/v3.5.0...v3.5.1
+
+## [3.5.0] - 2017-01-31
+
+* [#386](https://github.com/intridea/hashie/pull/386): Fix for #385: Make `deep_merge` always `deep_dup` nested hashes before merging them in so that there are no shared references between the two hashes being merged. - [@mltsy](https://github.com/mltsy).
+* [#389](https://github.com/intridea/hashie/pull/389): Support Ruby 2.4.0 - [@camelmasa](https://github.com/camelmasa).
+
+[3.5.0]: https://github.com/intridea/hashie/compare/v3.4.6...v3.5.0
+
+### Added
+
+* [#381](https://github.com/intridea/hashie/pull/381): Add a logging layer that lets us report potential issues to our users. As the first logged issue, report when a `Hashie::Mash` is attempting to overwrite a built-in method, since that is one of our number one questions - [@michaelherold](https://github.com/michaelherold).
+
+### Changed
+
+* [#384](https://github.com/intridea/hashie/pull/384): Updated to CodeClimate 1.x - [@boffbowsh](https://github.com/boffbowsh).
+
+### Fixed
+
+* [#369](https://github.com/intridea/hashie/pull/369): If a translation for a property exists when using IndifferentAccess and IgnoreUndeclared, use the translation to find the property - [@whitethunder](https://github.com/whitethunder).
+* [#376](https://github.com/intridea/hashie/pull/376): Leave string index unchanged if it can't be converted to integer for Array#dig - [@sazor](https://github.com/sazor).
+* [#377](https://github.com/intridea/hashie/pull/377): Dont use Rubygems to check ruby version - [@sazor](https://github.com/sazor).
+* [#378](https://github.com/intridea/hashie/pull/378): Deep find all searches inside all nested hashes - [@sazor](https://github.com/sazor).
+* [#380](https://github.com/intridea/hashie/pull/380): Evaluate procs default values of Dash in object initialization - [@sazor](https://github.com/sazor).
+
+### Miscellanous
+
+* [#387](https://github.com/intridea/hashie/pull/387): Fix builds failing due to Rake 11 having a breaking change - [@michaelherold](https://github.com/michaelherold).
 
 ## [3.4.6] - 2016-09-16
 

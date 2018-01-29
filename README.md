@@ -20,13 +20,22 @@ $ gem install hashie
 
 ## Upgrading
 
-You're reading the documentation for the next release of Hashie, which should be 3.4.7. Please read [UPGRADING](UPGRADING.md) when upgrading from a previous version. The current stable release is [3.4.6](https://github.com/intridea/hashie/blob/v3.4.6/README.md).
+You're reading the documentation for the next release of Hashie, which should be 3.5.8. Please read [UPGRADING](UPGRADING.md) when upgrading from a previous version. The current stable release is [3.5.7](https://github.com/intridea/hashie/blob/v3.5.7/README.md).
 
 ## Hash Extensions
 
 The library is broken up into a number of atomically includable Hash extension modules as described below. This provides maximum flexibility for users to mix and match functionality while maintaining feature parity with earlier versions of Hashie.
 
 Any of the extensions listed below can be mixed into a class by `include`-ing `Hashie::Extensions::ExtensionName`.
+
+## Logging
+
+Hashie has a built-in logger that you can override. By default, it logs to `STDOUT` but can be replaced by any `Logger` class. The logger is accessible on the Hashie module, as shown below:
+
+```ruby
+# Set the logger to the Rails logger
+Hashie.logger = Rails.logger
+```
 
 ### Coercion
 
@@ -83,6 +92,7 @@ Coercions allow you to set up "coercion rules" based either on the key or the va
 ```ruby
 class Tweet < Hash
   include Hashie::Extensions::Coercion
+  include Hashie::Extensions::MergeInitializer
   coerce_key :user, User
 end
 
@@ -569,6 +579,39 @@ mash = Mash.load('data/user.csv', parser: MyCustomCsvParser)
 mash[1] #=> { name: 'John', lastname: 'Doe' }
 ```
 
+Since Mash gives you the ability to set arbitrary keys that then act as methods, Hashie logs when there is a conflict between a key and a pre-existing method. You can set the logger that this logs message to via the global Hashie logger:
+
+```ruby
+Hashie.logger = Rails.logger
+```
+
+You can also disable the logging in subclasses of Mash:
+
+```ruby
+class Response < Hashie::Mash
+  disable_warnings
+end
+```
+
+### Mash Extension: KeepOriginalKeys
+
+This extension can be mixed into a Mash to keep the form of any keys passed directly into the Mash. By default, Mash converts keys to strings to give indifferent access. This extension still allows indifferent access, but keeps the form of the keys to eliminate confusion when you're not expecting the keys to change.
+
+```ruby
+class KeepingMash < ::Hashie::Mash
+  include Hashie::Extensions::Mash::KeepOriginalKeys
+end
+
+mash = KeepingMash.new(:symbol_key => :symbol, 'string_key' => 'string')
+mash.to_hash == { :symbol_key => :symbol, 'string_key' => 'string' }  #=> true
+mash.symbol_key  #=> :symbol
+mash[:symbol_key]  #=> :symbol
+mash['symbol_key']  #=> :symbol
+mash.string_key  #=> 'string'
+mash['string_key']  #=> 'string'
+mash[:string_key]  #=> 'string'
+```
+
 ### Mash Extension: SafeAssignment
 
 This extension can be mixed into a Mash to guard the attempted overwriting of methods by property setters. When mixed in, the Mash will raise an `ArgumentError` if you attempt to write a property with the same name as an existing method.
@@ -584,6 +627,33 @@ safe_mash = SafeMash.new
 safe_mash.zip   = 'Test' # => ArgumentError
 safe_mash[:zip] = 'test' # => still ArgumentError
 ```
+
+### Mash Extension:: SymbolizeKeys
+
+This extension can be mixed into a Mash to change the default behavior of converting keys to strings. After mixing this extension into a Mash, the Mash will convert all keys to symbols.
+
+```ruby
+class SymbolizedMash < ::Hashie::Mash
+  include Hashie::Extensions::Mash::SymbolizeKeys
+end
+
+symbol_mash = SymbolizedMash.new
+symbol_mash['test'] = 'value'
+symbol_mash.test  #=> 'value'
+symbol_mash.to_h  #=> {test: 'value'}
+```
+
+There is a major benefit and coupled with a major trade-off to this decision (at least on older Rubies). As a benefit, by using symbols as keys, you will be able to use the implicit conversion of a Mash via the `#to_hash` method to destructure (or splat) the contents of a Mash out to a block. This can be handy for doing iterations through the Mash's keys and values, as follows:
+
+```ruby
+symbol_mash = SymbolizedMash.new(id: 123, name: 'Rey')
+symbol_mash.each do |key, value|
+  # key is :id, then :name
+  # value is 123, then 'Rey'
+end
+```
+
+However, on Rubies less than 2.0, this means that every key you send to the Mash will generate a symbol. Since symbols are not garbage-collected on older versions of Ruby, this can cause a slow memory leak when using a symbolized Mash with data generated from user input.
 
 ## Dash
 

@@ -1,8 +1,9 @@
 require 'spec_helper'
-require 'delegate'
 
 describe Hashie::Mash do
   subject { Hashie::Mash.new }
+
+  include_context 'with a logger'
 
   it 'inherits from Hash' do
     expect(subject.is_a?(Hash)).to be_truthy
@@ -132,6 +133,47 @@ describe Hashie::Mash do
   it 'returns the value if type is a key' do
     subject.type = 'Steve'
     expect(subject.type).to eq 'Steve'
+  end
+
+  include_context 'with a logger' do
+    it 'logs a warning when overriding built-in methods' do
+      Hashie::Mash.new('trust' => { 'two' => 2 })
+
+      expect(logger_output).to match('Hashie::Mash#trust')
+    end
+
+    it 'can set keys more than once and does not warn when doing so' do
+      mash = Hashie::Mash.new
+      mash[:test_key] = 'Test value'
+
+      expect { mash[:test_key] = 'A new value' }.not_to raise_error
+      expect(logger_output).to be_blank
+    end
+
+    it 'does not write to the logger when warnings are disabled' do
+      mash_class = Class.new(Hashie::Mash) do
+        disable_warnings
+      end
+
+      mash_class.new('trust' => { 'two' => 2 })
+
+      expect(logger_output).to be_blank
+    end
+
+    it 'cannot disable logging on the base Mash' do
+      expect { Hashie::Mash.disable_warnings }.to raise_error(Hashie::Mash::CannotDisableMashWarnings)
+    end
+
+    it 'carries over the disable for warnings on grandchild classes' do
+      child_class = Class.new(Hashie::Mash) do
+        disable_warnings
+      end
+      grandchild_class = Class.new(child_class)
+
+      grandchild_class.new('trust' => { 'two' => 2 })
+
+      expect(logger_output).to be_blank
+    end
   end
 
   context 'updating' do
@@ -606,6 +648,20 @@ describe Hashie::Mash do
 
       it 'raise an ArgumentError' do
         expect { subject }.to raise_exception(ArgumentError)
+      end
+    end
+
+    context 'if the file is passed as Pathname' do
+      require 'pathname'
+      let(:path) { Pathname.new('database.yml') }
+
+      before do
+        expect(File).to receive(:file?).with(path).and_return(true)
+        expect(parser).to receive(:perform).with(path).and_return(config)
+      end
+
+      it 'return a Mash from a file' do
+        expect(subject.production.foo).to eq config['production']['foo']
       end
     end
 

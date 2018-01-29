@@ -12,6 +12,10 @@ class DashTest < Hashie::Dash
   property :count, default: 0
 end
 
+class DashTestDefaultProc < Hashie::Dash
+  property :fields, default: -> { [] }
+end
+
 class DashNoRequiredTest < Hashie::Dash
   property :first_name
   property :email
@@ -49,6 +53,13 @@ end
 class DeferredWithSelfTest < Hashie::Dash
   property :created_at, default: -> { Time.now }
   property :updated_at, default: ->(test) { test.created_at }
+end
+
+describe DashTestDefaultProc do
+  it 'as_json behaves correctly with default proc' do
+    object = described_class.new
+    expect(object.as_json).to be == { 'fields' => [] }
+  end
 end
 
 describe DashTest do
@@ -178,6 +189,32 @@ describe DashTest do
       deferred = DeferredWithSelfTest.new
       expect(deferred[:created_at].object_id).to eq deferred[:created_at].object_id
       expect(deferred[:updated_at].object_id).to eq deferred[:created_at].object_id
+    end
+  end
+
+  context 'converting from a Mash' do
+    class ConvertingFromMash < Hashie::Dash
+      property :property, required: true
+    end
+
+    context 'without keeping the original keys' do
+      let(:mash) { Hashie::Mash.new(property: 'test') }
+
+      it 'does not pick up the property from the stringified key' do
+        expect { ConvertingFromMash.new(mash) }.to raise_error(NoMethodError)
+      end
+    end
+
+    context 'when keeping the original keys' do
+      class KeepingMash < Hashie::Mash
+        include Hashie::Extensions::Mash::KeepOriginalKeys
+      end
+
+      let(:mash) { KeepingMash.new(property: 'test') }
+
+      it 'picks up the property from the original key' do
+        expect { ConvertingFromMash.new(mash) }.not_to raise_error
+      end
     end
   end
 
