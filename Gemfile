@@ -16,9 +16,16 @@ group :test do
   # ActiveSupport required to test compatibility with ActiveSupport Core Extensions.
   require File.expand_path('../lib/hashie/extensions/ruby_version', __FILE__)
   if Hashie::Extensions::RubyVersion.new(RUBY_VERSION) >= Hashie::Extensions::RubyVersion.new('2.4.0')
+    gem 'activemodel',   '~> 5.x', require: false
     gem 'activesupport', '~> 5.x', require: false
   else
     gem 'activesupport', '~> 4.x', require: false
+  end
+  if Hashie::Extensions::RubyVersion.new(RUBY_VERSION) >= Hashie::Extensions::RubyVersion.new('2.1.0')
+    gem 'dry-types', require: false
+  else
+    gem 'dry-monads', '0.1.1', require: false
+    gem 'dry-types',  '0.8.1', require: false
   end
   gem 'codeclimate-test-reporter', '~> 1.0', require: false
   gem 'rspec-core', '~> 3.1.7'
