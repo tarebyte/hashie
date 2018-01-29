@@ -21,7 +21,6 @@ group :test do
   else
     gem 'activesupport', '~> 4.x', require: false
   end
-
   if Hashie::Extensions::RubyVersion.new(RUBY_VERSION) >= Hashie::Extensions::RubyVersion.new('2.1.0')
     gem 'dry-types', require: false
   else
